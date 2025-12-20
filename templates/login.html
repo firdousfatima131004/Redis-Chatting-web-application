@@ -1,13 +1,140 @@
 {% extends "base.html" %}
 
-{% block title %}Login - Chat App{% endblock %}
+{% block title %}Login - PV-Chat{% endblock %}
 
 {% block content %}
+<style>
+/* --- Global Reset & Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #d9f0ff, #ffffff);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* --- Cursor Interaction --- */
+body {
+    cursor: none;
+}
+.cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: rgba(0, 123, 255, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, background 0.2s ease, width 0.2s ease, height 0.2s ease;
+    z-index: 1000;
+}
+
+/* --- Auth Container --- */
+.auth-container {
+    perspective: 1200px;
+}
+
+.auth-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transform-style: preserve-3d;
+}
+
+.auth-card:hover {
+    transform: rotateY(5deg) rotateX(5deg) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+}
+
+.auth-card-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e3e3e3;
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    font-size: 16px;
+    color: #f8f8f8;
+}
+
+/* --- Form Elements --- */
+.form-control-custom {
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    padding: 12px 15px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.form-control-custom:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0,123,255,0.3);
+    outline: none;
+}
+
+/* --- Button --- */
+.btn-primary-custom {
+    background: linear-gradient(135deg, #007bff, #00d4ff);
+    border: none;
+    border-radius: 15px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,123,255,0.4);
+}
+
+/* --- Links --- */
+.auth-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.auth-link-text {
+    font-size: 14px;
+    color: #555;
+}
+</style>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+
 <div class="auth-container">
-    <div class="auth-card">
+    <div class="auth-card" id="auth-card">
         <div class="auth-card-header">
             <h2 class="auth-title">Welcome Back</h2>
-            <p class="auth-subtitle">Sign in to start chatting</p>
+            <p class="auth-subtitle" colot="white">Sign in to start chatting on PV-Chat</p>
         </div>
         <div class="auth-card-body">
             <form method="POST" action="{{ url_for('login') }}">
@@ -27,5 +154,28 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
+<script>
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+});
+
+// 3D Card Tilt Effect
+const card = document.getElementById('auth-card');
+card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const dx = (x - cx) / cx;
+    const dy = (y - cy) / cy;
+    card.style.transform = `rotateY(${dx*10}deg) rotateX(${-dy*10}deg)`;
+});
+
+card.addEventListener('mouseleave', () => {
+    card.style.transform = `rotateY(0deg) rotateX(0deg) scale(1)`;
+});
+</script>
+{% endblock %}

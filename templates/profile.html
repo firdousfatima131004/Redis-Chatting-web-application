@@ -2,140 +2,243 @@
 
 {% block title %}Profile - {{ user.username }}{% endblock %}
 
-{% block extra_head %}
-<style>
-    .profile-container {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-    }
-
-    .profile-card {
-        background: var(--bg-primary);
-        border-radius: 12px;
-        box-shadow: var(--shadow-lg);
-        overflow: hidden;
-        width: 100%;
-        max-width: 600px;
-    }
-
-    .profile-header {
-        background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
-        color: #FFFFFF;
-        padding: 2rem;
-        text-align: center;
-        position: relative;
-    }
-
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        margin: 0 auto 1rem;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .profile-username {
-        font-size: 1.75rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .profile-body {
-        padding: 2rem;
-    }
-
-    .profile-info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 0;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .profile-info-item:last-child {
-        border-bottom: none;
-    }
-
-    .profile-info-label {
-        font-weight: 500;
-        color: var(--text-secondary);
-    }
-
-    .profile-info-value {
-        color: var(--text-primary);
-        font-weight: 600;
-    }
-
-    .status-badge-profile {
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-
-    .status-badge-profile.online {
-        background-color: rgba(40, 167, 69, 0.1);
-        color: var(--online-green);
-    }
-
-    .status-badge-profile.offline {
-        background-color: rgba(108, 117, 125, 0.1);
-        color: var(--offline-gray);
-    }
-
-    .profile-actions {
-        padding: 1.5rem 2rem;
-        border-top: 1px solid var(--border-color);
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* ===============================
+   GLOBAL + CURSOR
+================================ */
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top left, #dbeafe, #eef2ff, #ffffff);
+    overflow: hidden;
+    cursor: none;
+}
+
+.cursor {
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    background: rgba(99, 102, 241, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: transform 0.08s ease;
+    z-index: 9999;
+}
+
+/* ===============================
+   FLOATING ORBS
+================================ */
+.bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.6;
+    animation: float 12s infinite ease-in-out;
+}
+.orb-1 {
+    width: 320px;
+    height: 320px;
+    background: #93c5fd;
+    top: -120px;
+    left: -120px;
+}
+.orb-2 {
+    width: 380px;
+    height: 380px;
+    background: #c7d2fe;
+    bottom: -150px;
+    right: -150px;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-45px); }
+}
+
+/* ===============================
+   CONTAINER
+================================ */
+.profile-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ===============================
+   GLASS CARD
+================================ */
+.profile-card {
+    width: 520px;
+    max-width: 92%;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow:
+        0 30px 60px rgba(99,102,241,0.25),
+        inset 0 0 0 1px rgba(255,255,255,0.5);
+    transform-style: preserve-3d;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: fadeUp 0.9s ease;
+    overflow: hidden;
+}
+
+.profile-card:hover {
+    box-shadow: 0 40px 80px rgba(99,102,241,0.35);
+}
+
+/* ===============================
+   HEADER
+================================ */
+.profile-header {
+    background: linear-gradient(135deg, #4f8ef7, #6366f1);
+    padding: 2.5rem 2rem 3rem;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border: 4px solid rgba(255,255,255,0.35);
+}
+
+.profile-username {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 0.35rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.25);
+}
+
+/* ===============================
+   BODY
+================================ */
+.profile-body {
+    padding: 2rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ===============================
+   ACTIONS
+================================ */
+.profile-actions {
+    padding: 1.5rem 2rem 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #4f8ef7, #6366f1);
+    border: none;
+    border-radius: 16px;
+    padding: 0.7rem 1.6rem;
+    font-weight: 600;
+    color: white;
+    box-shadow: 0 12px 28px rgba(99,102,241,0.35);
+    transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 45px rgba(99,102,241,0.5);
+}
+
+.btn-outline-danger {
+    border-radius: 16px;
+    padding: 0.7rem 1.6rem;
+}
+
+/* ===============================
+   ANIMATION
+================================ */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+
+<!-- Orbs -->
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+
 <div class="profile-container">
-    <div class="profile-card">
+    <div class="profile-card" id="profile-card">
         <div class="profile-header">
             <div class="profile-avatar">
-                <i class="bi bi-person-circle"></i>
+                <i class="bi bi-person"></i>
             </div>
             <div class="profile-username">{{ user.username }}</div>
-            <div class="status-badge-profile {{ 'online' if stats.is_online else 'offline' }}">
+            <span class="status-pill">
                 {{ 'Online' if stats.is_online else 'Offline' }}
-            </div>
+            </span>
         </div>
 
         <div class="profile-body">
-            <div class="profile-info-item">
-                <span class="profile-info-label">
-                    <i class="bi bi-person"></i> Username
-                </span>
-                <span class="profile-info-value">{{ user.username }}</span>
+            <div class="info-row">
+                <span class="info-label">Username</span>
+                <span class="info-value">{{ user.username }}</span>
             </div>
 
-            <div class="profile-info-item">
-                <span class="profile-info-label">
-                    <i class="bi bi-calendar"></i> Member Since
-                </span>
-                <span class="profile-info-value">
+            <div class="info-row">
+                <span class="info-label">Member Since</span>
+                <span class="info-value">
                     {{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}
                 </span>
             </div>
 
-            <div class="profile-info-item">
-                <span class="profile-info-label">
-                    <i class="bi bi-clock"></i> Account Age
-                </span>
-                <span class="profile-info-value">
+            <div class="info-row">
+                <span class="info-label">Account Age</span>
+                <span class="info-value">
                     {% if stats.account_age_days is not none %}
                         {% if stats.account_age_days == 0 %}
                             Today
@@ -150,18 +253,16 @@
                 </span>
             </div>
 
-            <div class="profile-info-item">
-                <span class="profile-info-label">
-                    <i class="bi bi-circle-fill"></i> Status
-                </span>
-                <span class="status-badge-profile {{ 'online' if stats.is_online else 'offline' }}">
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value">
                     {{ 'Online' if stats.is_online else 'Offline' }}
                 </span>
             </div>
         </div>
 
         <div class="profile-actions">
-            <a href="{{ url_for('chat') }}" class="btn btn-primary">
+            <a href="{{ url_for('chat') }}" class="btn btn-primary-custom">
                 <i class="bi bi-arrow-left"></i> Back to Chat
             </a>
             <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
@@ -170,5 +271,35 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
+<script>
+/* Cursor */
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+});
+
+/* 3D Tilt */
+const card = document.getElementById('profile-card');
+card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+
+    const dx = (x - cx) / cx;
+    const dy = (y - cy) / cy;
+
+    card.style.transform = `
+        rotateY(${dx * 10}deg)
+        rotateX(${-dy * 10}deg)
+        scale(1.02)
+    `;
+});
+
+card.addEventListener('mouseleave', () => {
+    card.style.transform = 'rotateY(0) rotateX(0) scale(1)';
+});
+</script>
+{% endblock %}

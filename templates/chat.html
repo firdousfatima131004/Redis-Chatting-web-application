@@ -4,11 +4,263 @@
 
 {% block extra_head %}
 <style>
-    .chat-container {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+/* =====================
+   GENERAL LAYOUT
+===================== */
+body[data-theme="light"] {
+    --bg-color: #f8f9fa;
+    --header-bg: #ffffff;
+    --sidebar-bg: #ffffff;
+    --chat-bg: #e9f0ff;
+    --msg-own-bg: #4f8ef7;
+    --msg-other-bg: #f1f1f1;
+    --text-color: #333;
+    --accent-color: #4f8ef7;
+}
+
+body[data-theme="dark"] {
+    --bg-color: #121212;
+    --header-bg: #1f1f1f;
+    --sidebar-bg: #1a1a1a;
+    --chat-bg: #1e1e2f;
+    --msg-own-bg: #4f8ef7;
+    --msg-other-bg: #2a2a3a;
+    --text-color: #ddd;
+    --accent-color: #4f8ef7;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+}
+
+.chat-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* =====================
+   HEADER
+===================== */
+.chat-header {
+    background-color: var(--header-bg);
+    padding: 0.8rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideDown 0.5s ease;
+}
+
+.username-badge {
+    background: var(--accent-color);
+    color: #fff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* =====================
+   MAIN LAYOUT
+===================== */
+.chat-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* =====================
+   SIDEBAR
+===================== */
+.chat-sidebar {
+    width: 280px;
+    background: var(--sidebar-bg);
+    box-shadow: inset -1px 0 0 rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1.2rem;
+    animation: fadeIn 0.6s ease;
+}
+
+.sidebar-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+.recent-users, .active-chats {
+    background: rgba(255,255,255,0.05);
+    border-radius: 0.6rem;
+    padding: 0.5rem;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.user-result-item, .chat-item {
+    padding: 0.5rem 0.8rem;
+    margin-bottom: 0.3rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+.user-result-item:hover, .chat-item:hover {
+    background: rgba(79, 142, 247, 0.1);
+    transform: translateX(5px);
+}
+
+/* =====================
+   CHAT AREA
+===================== */
+.chat-area {
+    flex: 1;
+    background: var(--chat-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 1rem 1rem 0;
+}
+
+.no-chat-selected {
+    text-align: center;
+    color: #888;
+    margin-top: 5rem;
+    animation: fadeIn 1s ease;
+}
+.no-chat-selected i {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+/* =====================
+   MESSAGES
+===================== */
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.message {
+    max-width: 70%;
+    padding: 0.5rem 0.8rem;
+    border-radius: 1rem;
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.4s forwards;
+}
+
+.message-own {
+    background: var(--msg-own-bg);
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 0.2rem;
+    box-shadow: 0 4px 12px rgba(79,142,247,0.3);
+}
+
+.message-other {
+    background: var(--msg-other-bg);
+    color: var(--text-color);
+    align-self: flex-start;
+    border-bottom-left-radius: 0.2rem;
+}
+
+/* Message Header & Footer */
+.message-header {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-color);
+}
+.message-footer {
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+    display: flex;
+    justify-content: space-between;
+}
+.timer-badge {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+.timer-badge.expired {
+    color: #ff4c4c;
+}
+
+/* =====================
+   INPUT AREA
+===================== */
+.chat-input-area {
+    margin-top: 0.8rem;
+}
+.chat-input-area input.form-control {
+    border-radius: 2rem 0.5rem 0.5rem 2rem;
+    padding-left: 1rem;
+}
+.chat-input-area button {
+    border-radius: 0.5rem 2rem 2rem 0.5rem;
+    transition: all 0.3s ease;
+}
+.chat-input-area button:hover {
+    transform: scale(1.05);
+}
+
+/* =====================
+   STATUS
+===================== */
+.status-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.4rem;
+    color: #fff;
+    font-weight: 500;
+}
+.status-badge.online { background: #4ade80; }
+.status-badge.offline { background: #9ca3af; }
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #9ca3af;
+}
+.status-indicator.online { background: #4ade80; }
+.status-indicator.offline { background: #9ca3af; }
+
+/* =====================
+   NOTIFICATIONS
+===================== */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--accent-color);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
+}
+
+/* =====================
+   ANIMATIONS
+===================== */
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+@keyframes fadeUp { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+@keyframes slideDown { from {transform:translateY(-20px); opacity:0;} to {transform:translateY(0); opacity:1;} }
+
 </style>
 {% endblock %}
 
@@ -36,15 +288,14 @@
     </div>
 
     <div class="chat-main">
-        <!-- Sidebar - All Users & Chats -->
+        <!-- Sidebar -->
         <div class="chat-sidebar">
-            <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="sidebar-section">
                 <h6 class="sidebar-title">All Users</h6>
-                <div id="recent-users" class="recent-users" style="flex: 1; overflow-y: auto;">
+                <div id="recent-users" class="recent-users">
                     <p class="text-muted text-center small" id="recent-users-status">Loading...</p>
                 </div>
             </div>
-
             <div class="sidebar-section">
                 <h6 class="sidebar-title">Active Chats</h6>
                 <div id="active-chats" class="active-chats">
@@ -69,9 +320,7 @@
                     </div>
                 </div>
 
-                <div id="messages-container" class="messages-container">
-                    <!-- Messages will be inserted here -->
-                </div>
+                <div id="messages-container" class="messages-container"></div>
 
                 <div class="chat-input-area">
                     <div class="d-flex gap-2 mb-2">
@@ -88,9 +337,7 @@
                     </div>
                     <div class="input-group">
                         <input type="text" id="message-input" class="form-control" placeholder="Type a message..." maxlength="500">
-                        <button class="btn btn-primary" id="send-button">
-                            <i class="bi bi-send"></i> Send
-                        </button>
+                        <button class="btn btn-primary" id="send-button"><i class="bi bi-send"></i> Send</button>
                     </div>
                 </div>
             </div>
@@ -99,347 +346,299 @@
 </div>
 <script>
     console.log('[DEBUG] ====== CHAT SCRIPT STARTING ======');
-  
+    
     const username = "{{ username }}";
     console.log('[DEBUG] Username from template:', username);
-  
-    // If you are serving frontend + backend on same origin, this is fine.
-    // If different origin/port, you MUST configure CORS with supports_credentials=True server-side
-    // and ALSO pass withCredentials here.
+    
     const socket = io({
-      withCredentials: true,
-      transports: ['websocket', 'polling'],
+        withCredentials: true,
+        transports: ['websocket', 'polling'],
     });
-  
+    
     let currentRoom = null;
     let messageTimers = {};
-  
-    // -----------------------------
-    // Load users (FIXED)
-    // -----------------------------
+    
+    /* -----------------------------
+       Load Recent Users
+    ----------------------------- */
     async function loadRecentUsers() {
-      console.log('[DEBUG] loadRecentUsers() called');
-  
-      const recentUsersDiv = document.getElementById('recent-users');
-      const statusEl = document.getElementById('recent-users-status');
-  
-      if (!recentUsersDiv) {
-        console.error('[ERROR] recent-users div not found');
-        return;
-      }
-  
-      if (statusEl) statusEl.textContent = 'Loading users...';
-  
-      try {
-        const res = await fetch('/api/recent-users', {
-          method: 'GET',
-          credentials: 'include',     // ✅ IMPORTANT: ensures session cookie is sent
-          headers: {
-            'Accept': 'application/json'
-            // ❌ do NOT set Content-Type on GET
-          }
-        });
-  
-        console.log('[DEBUG] /api/recent-users status:', res.status);
-  
-        if (res.status === 401) {
-          // not logged in or session expired
-          window.location.href = '/login';
-          return;
+        console.log('[DEBUG] loadRecentUsers() called');
+        const recentUsersDiv = document.getElementById('recent-users');
+        const statusEl = document.getElementById('recent-users-status');
+    
+        if (!recentUsersDiv) return;
+    
+        if (statusEl) statusEl.textContent = 'Loading users...';
+    
+        try {
+            const res = await fetch('/api/recent-users', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+    
+            if (res.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+    
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+                const msg = (data && data.error) ? data.error : 'Failed to load users';
+                throw new Error(msg);
+            }
+    
+            displayRecentUsers((data && data.users) ? data.users : []);
+        } catch (err) {
+            console.error('[ERROR] loadRecentUsers failed:', err);
+            recentUsersDiv.innerHTML = `<p class="text-muted text-center small">Error loading users: ${escapeHtml(err.message || 'Unknown error')}</p>`;
         }
-  
-        const data = await res.json().catch(() => null);
-  
-        if (!res.ok) {
-          const msg = (data && data.error) ? data.error : 'Failed to load users';
-          throw new Error(msg);
-        }
-  
-        displayRecentUsers((data && data.users) ? data.users : []);
-      } catch (err) {
-        console.error('[ERROR] loadRecentUsers failed:', err);
-        recentUsersDiv.innerHTML =
-          `<p class="text-muted text-center small">Error loading users: ${escapeHtml(err.message || 'Unknown error')}</p>`;
-      }
     }
-  
-    window.loadRecentUsers = loadRecentUsers; // keep for debugging
-  
-    // -----------------------------
-    // Render user list (FIXED - no inline onclick)
-    // -----------------------------
+    window.loadRecentUsers = loadRecentUsers;
+    
+    /* -----------------------------
+       Display Users
+    ----------------------------- */
     function displayRecentUsers(users) {
-      console.log('[DEBUG] displayRecentUsers called with:', users);
-  
-      const recentUsersDiv = document.getElementById('recent-users');
-      if (!recentUsersDiv) return;
-  
-      if (!users || users.length === 0) {
-        recentUsersDiv.innerHTML = '<p class="text-muted text-center small">No users found</p>';
-        return;
-      }
-  
-      recentUsersDiv.innerHTML = ''; // clear
-  
-      users.forEach(user => {
-        const item = document.createElement('div');
-        item.className = 'user-result-item';
-        item.style.cursor = 'pointer';
-        item.dataset.username = user.username;
-  
-        item.innerHTML = `
-          <div class="d-flex align-items-center justify-content-between">
-            <span>${escapeHtml(user.username)}</span>
-            <span class="status-badge ${user.online ? 'online' : 'offline'}"
-                  data-username="${escapeHtml(user.username)}">
-              ${user.online ? 'Online' : 'Offline'}
-            </span>
-          </div>
-        `;
-  
-        item.addEventListener('click', () => startChat(user.username));
-        recentUsersDiv.appendChild(item);
-      });
-  
-      console.log('[DEBUG] Users rendered successfully');
-    }
-  
-    // -----------------------------
-    // Socket events
-    // -----------------------------
-    socket.on('connect', () => {
-      console.log('[DEBUG] Socket connected:', socket.id);
-      startPingInterval();
-      loadRecentUsers();
-    });
-  
-    socket.on('connected', (data) => {
-      console.log('[DEBUG] Connected as:', data.username);
-    });
-  
-    socket.on('user_status', (data) => {
-      // data: {username, status}
-      updateUserStatus(data.username, data.status);
-    });
-  
-    socket.on('chat_started', (data) => {
-      currentRoom = data.room;
-      showChatWindow(data.other_user, data.messages || []);
-    });
-  
-    socket.on('new_message', (data) => {
-      if (currentRoom && currentRoom === data.room) {
-        addMessage(data);
-        if (data.from !== username) {
-          showNotification('New message from ' + data.from);
+        const recentUsersDiv = document.getElementById('recent-users');
+        if (!recentUsersDiv) return;
+    
+        if (!users || users.length === 0) {
+            recentUsersDiv.innerHTML = '<p class="text-muted text-center small">No users found</p>';
+            return;
         }
-      }
+    
+        recentUsersDiv.innerHTML = '';
+    
+        users.forEach(user => {
+            const item = document.createElement('div');
+            item.className = 'user-result-item';
+            item.style.cursor = 'pointer';
+            item.dataset.username = user.username;
+    
+            item.innerHTML = `
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>${escapeHtml(user.username)}</span>
+                    <span class="status-badge ${user.online ? 'online' : 'offline'}" data-username="${escapeHtml(user.username)}">
+                        ${user.online ? 'Online' : 'Offline'}
+                    </span>
+                </div>
+            `;
+    
+            item.addEventListener('click', () => startChat(user.username));
+            recentUsersDiv.appendChild(item);
+        });
+    }
+    
+    /* -----------------------------
+       Socket Events
+    ----------------------------- */
+    socket.on('connect', () => {
+        console.log('[DEBUG] Socket connected:', socket.id);
+        startPingInterval();
+        loadRecentUsers();
     });
-  
-    socket.on('message_sent', (data) => {
-      startMessageTimer(data.message_id, data.time_remaining);
+    
+    socket.on('user_status', (data) => updateUserStatus(data.username, data.status));
+    socket.on('chat_started', (data) => { currentRoom = data.room; showChatWindow(data.other_user, data.messages || []); });
+    socket.on('new_message', (data) => {
+        if (currentRoom && currentRoom === data.room) {
+            addMessage(data);
+            if (data.from !== username) showNotification('New message from ' + data.from);
+        }
     });
-  
-    socket.on('error', (data) => {
-      alert('Error: ' + (data && data.message ? data.message : 'Unknown error'));
-    });
-  
-    // -----------------------------
-    // Chat actions
-    // -----------------------------
+    socket.on('message_sent', (data) => startMessageTimer(data.message_id, data.time_remaining));
+    socket.on('error', (data) => alert('Error: ' + (data?.message || 'Unknown error')));
+    
+    /* -----------------------------
+       Chat Functions
+    ----------------------------- */
     function startChat(otherUsername) {
-      console.log('[DEBUG] Starting chat with:', otherUsername);
-      socket.emit('start_chat', { username: otherUsername });
+        socket.emit('start_chat', { username: otherUsername });
     }
     window.startChat = startChat;
-  
+    
     function showChatWindow(otherUsername, messages) {
-      document.getElementById('no-chat-selected').style.display = 'none';
-      document.getElementById('chat-window').style.display = 'flex';
-      document.getElementById('other-username').textContent = otherUsername;
-  
-      const container = document.getElementById('messages-container');
-      container.innerHTML = '';
-  
-      messages.forEach(msg => {
-        addMessage(msg);
-        if (msg.time_remaining) startMessageTimer(msg.id, msg.time_remaining);
-      });
-  
-      updateActiveChats(otherUsername);
+        document.getElementById('no-chat-selected').style.display = 'none';
+        document.getElementById('chat-window').style.display = 'flex';
+        document.getElementById('other-username').textContent = otherUsername;
+    
+        const container = document.getElementById('messages-container');
+        container.innerHTML = '';
+        messages.forEach(msg => {
+            addMessage(msg);
+            if (msg.time_remaining) startMessageTimer(msg.id, msg.time_remaining);
+        });
+    
+        updateActiveChats(otherUsername);
     }
-  
+    
     function addMessage(data) {
-      const container = document.getElementById('messages-container');
-      const isFromMe = data.from === username;
-  
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `message ${isFromMe ? 'message-own' : 'message-other'}`;
-      messageDiv.id = `msg-${data.id}`;
-  
-      const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const expiresAt = new Date(data.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  
-      messageDiv.innerHTML = `
-        <div class="message-header">
-          <span class="message-sender">${isFromMe ? 'You' : escapeHtml(data.from)}</span>
-          <span class="message-time">${time}</span>
-        </div>
-        <div class="message-content">${escapeHtml(data.message)}</div>
-        <div class="message-footer">
-          <small class="text-muted">Expires at ${expiresAt}</small>
-          <span class="timer-badge" id="timer-${data.id}"></span>
-        </div>
-      `;
-  
-      container.appendChild(messageDiv);
-      container.scrollTop = container.scrollHeight;
+        const container = document.getElementById('messages-container');
+        const isFromMe = data.from === username;
+    
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isFromMe ? 'message-own' : 'message-other'}`;
+        messageDiv.id = `msg-${data.id}`;
+    
+        const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const expiresAt = new Date(data.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <span class="message-sender">${isFromMe ? 'You' : escapeHtml(data.from)}</span>
+                <span class="message-time">${time}</span>
+            </div>
+            <div class="message-content">${escapeHtml(data.message)}</div>
+            <div class="message-footer">
+                <small class="text-muted">Expires at ${expiresAt}</small>
+                <span class="timer-badge" id="timer-${data.id}"></span>
+            </div>
+        `;
+    
+        container.appendChild(messageDiv);
+        container.scrollTop = container.scrollHeight;
     }
-  
-    // -----------------------------
-    // Timers
-    // -----------------------------
+    
+    /* -----------------------------
+       Message Timer
+    ----------------------------- */
     function startMessageTimer(messageId, seconds) {
-      if (messageTimers[messageId]) clearInterval(messageTimers[messageId]);
-  
-      let remaining = seconds;
-      const timerElement = document.getElementById(`timer-${messageId}`);
-      const messageElement = document.getElementById(`msg-${messageId}`);
-      if (!timerElement || !messageElement) return;
-  
-      const updateTimer = () => {
-        if (remaining <= 0) {
-          messageElement.style.opacity = '0.3';
-          timerElement.textContent = 'Expired';
-          timerElement.className = 'timer-badge expired';
-          clearInterval(messageTimers[messageId]);
-          return;
-        }
-        const minutes = Math.floor(remaining / 60);
-        const secs = remaining % 60;
-        timerElement.textContent = `${minutes}m ${secs}s`;
-        remaining--;
-      };
-  
-      updateTimer();
-      messageTimers[messageId] = setInterval(updateTimer, 1000);
+        if (messageTimers[messageId]) clearInterval(messageTimers[messageId]);
+    
+        let remaining = seconds;
+        const timerElement = document.getElementById(`timer-${messageId}`);
+        const messageElement = document.getElementById(`msg-${messageId}`);
+        if (!timerElement || !messageElement) return;
+    
+        const updateTimer = () => {
+            if (remaining <= 0) {
+                messageElement.style.opacity = '0.3';
+                timerElement.textContent = 'Expired';
+                timerElement.className = 'timer-badge expired';
+                clearInterval(messageTimers[messageId]);
+                return;
+            }
+            const minutes = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            timerElement.textContent = `${minutes}m ${secs}s`;
+            remaining--;
+        };
+    
+        updateTimer();
+        messageTimers[messageId] = setInterval(updateTimer, 1000);
     }
-  
-    // -----------------------------
-    // Online status update (FIXED selector)
-    // -----------------------------
+    
+    /* -----------------------------
+       Update Status & Chats
+    ----------------------------- */
     function updateUserStatus(userUsername, status) {
-      const badge = document.querySelector(`.status-badge[data-username="${cssEscape(userUsername)}"]`);
-      if (!badge) return;
-  
-      badge.classList.remove('online', 'offline');
-      badge.classList.add(status === 'online' ? 'online' : 'offline');
-      badge.textContent = status === 'online' ? 'Online' : 'Offline';
+        const badge = document.querySelector(`.status-badge[data-username="${cssEscape(userUsername)}"]`);
+        if (!badge) return;
+        badge.classList.remove('online', 'offline');
+        badge.classList.add(status === 'online' ? 'online' : 'offline');
+        badge.textContent = status === 'online' ? 'Online' : 'Offline';
     }
-  
+    
     function updateActiveChats(otherUsername) {
-      const activeChatsDiv = document.getElementById('active-chats');
-      const existing = activeChatsDiv.querySelector(`[data-chat="${cssEscape(otherUsername)}"]`);
-      if (existing) return;
-  
-      const chatItem = document.createElement('div');
-      chatItem.className = 'chat-item';
-      chatItem.dataset.chat = otherUsername;
-      chatItem.style.cursor = 'pointer';
-  
-      chatItem.innerHTML = `
-        <div class="d-flex align-items-center justify-content-between">
-          <span>${escapeHtml(otherUsername)}</span>
-          <span class="status-badge offline" data-username="${escapeHtml(otherUsername)}">Offline</span>
-        </div>
-      `;
-  
-      chatItem.addEventListener('click', () => startChat(otherUsername));
-      activeChatsDiv.insertBefore(chatItem, activeChatsDiv.firstChild);
+        const activeChatsDiv = document.getElementById('active-chats');
+        const existing = activeChatsDiv.querySelector(`[data-chat="${cssEscape(otherUsername)}"]`);
+        if (existing) return;
+    
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-item';
+        chatItem.dataset.chat = otherUsername;
+        chatItem.style.cursor = 'pointer';
+        chatItem.innerHTML = `
+            <div class="d-flex align-items-center justify-content-between">
+                <span>${escapeHtml(otherUsername)}</span>
+                <span class="status-badge offline" data-username="${escapeHtml(otherUsername)}">Offline</span>
+            </div>
+        `;
+        chatItem.addEventListener('click', () => startChat(otherUsername));
+        activeChatsDiv.insertBefore(chatItem, activeChatsDiv.firstChild);
     }
-  
-    // -----------------------------
-    // Send message
-    // -----------------------------
+    
+    /* -----------------------------
+       Send Message
+    ----------------------------- */
     document.getElementById('send-button').addEventListener('click', sendMessage);
     document.getElementById('message-input').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
+        if (e.key === 'Enter') sendMessage();
     });
-  
+    
     function sendMessage() {
-      const input = document.getElementById('message-input');
-      const message = input.value.trim();
-      const expiration = document.getElementById('expiration-select').value;
-  
-      if (!message || !currentRoom) return;
-  
-      socket.emit('send_message', {
-        room: currentRoom,
-        message: message,
-        expiration: expiration
-      });
-  
-      input.value = '';
+        const input = document.getElementById('message-input');
+        const message = input.value.trim();
+        const expiration = document.getElementById('expiration-select').value;
+    
+        if (!message || !currentRoom) return;
+    
+        socket.emit('send_message', {
+            room: currentRoom,
+            message: message,
+            expiration: expiration
+        });
+    
+        input.value = '';
     }
-  
-    // -----------------------------
-    // Theme
-    // -----------------------------
+    
+    /* -----------------------------
+       Theme Toggle
+    ----------------------------- */
     document.getElementById('theme-toggle').addEventListener('click', () => {
-      const body = document.body;
-      const currentTheme = body.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateThemeIcon(newTheme);
+        const body = document.body;
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
     });
-  
+    
     function updateThemeIcon(theme) {
-      const icon = document.getElementById('theme-icon');
-      icon.className = theme === 'light' ? 'bi bi-moon-stars' : 'bi bi-sun';
+        const icon = document.getElementById('theme-icon');
+        icon.className = theme === 'light' ? 'bi bi-moon-stars' : 'bi bi-sun';
     }
-  
+    
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.body.setAttribute('data-theme', savedTheme);
     updateThemeIcon(savedTheme);
-  
-    // -----------------------------
-    // Ping
-    // -----------------------------
+    
+    /* -----------------------------
+       Ping
+    ----------------------------- */
     function startPingInterval() {
-      setInterval(() => socket.emit('ping'), 30000);
+        setInterval(() => socket.emit('ping'), 30000);
     }
-  
-    // -----------------------------
-    // Utilities
-    // -----------------------------
+    
+    /* -----------------------------
+       Utilities
+    ----------------------------- */
     function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text ?? '';
-      return div.innerHTML;
+        const div = document.createElement('div');
+        div.textContent = text ?? '';
+        return div.innerHTML;
     }
-  
+    
     function showNotification(message) {
-      const notification = document.createElement('div');
-      notification.className = 'notification';
-      notification.textContent = message;
-      document.body.appendChild(notification);
-      setTimeout(() => notification.remove(), 3000);
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
     }
-  
-    // Escape for querySelector attribute usage
+    
     function cssEscape(s) {
-      // minimal escape for quotes/backslashes
-      return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     }
-  
-    // Also load once in case socket connect is slow
+    
+    /* -----------------------------
+       Load users on ready
+    ----------------------------- */
     if (document.readyState !== 'loading') {
-      loadRecentUsers();
+        loadRecentUsers();
     } else {
-      document.addEventListener('DOMContentLoaded', loadRecentUsers);
+        document.addEventListener('DOMContentLoaded', loadRecentUsers);
     }
-  </script>
-  
+    </script>
 {% endblock %}
-

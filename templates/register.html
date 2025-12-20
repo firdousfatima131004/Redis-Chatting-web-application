@@ -1,33 +1,276 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Chat App{% endblock %}
+{% block title %}Register - PV-Chat{% endblock %}
 
 {% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* ===============================
+   GLOBAL + CURSOR
+================================ */
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top left, #dbeafe, #eef2ff, #ffffff);
+    overflow: hidden;
+    cursor: none;
+}
+
+.cursor {
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    background: rgba(99, 102, 241, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: 
+        transform 0.08s ease,
+        width 0.2s ease,
+        height 0.2s ease,
+        background 0.2s ease;
+    z-index: 9999;
+}
+
+/* ===============================
+   FLOATING BACKGROUND ORBS
+================================ */
+.bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.6;
+    animation: float 12s infinite ease-in-out;
+}
+.orb-1 {
+    width: 320px;
+    height: 320px;
+    background: #93c5fd;
+    top: -120px;
+    left: -120px;
+}
+.orb-2 {
+    width: 380px;
+    height: 380px;
+    background: #c7d2fe;
+    bottom: -150px;
+    right: -150px;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-45px); }
+}
+
+/* ===============================
+   CONTAINER
+================================ */
+.auth-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ===============================
+   3D GLASS CARD
+================================ */
+.auth-card {
+    width: 420px;
+    max-width: 90%;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(20px);
+    border-radius: 22px;
+    padding: 2.6rem;
+    box-shadow:
+        0 30px 60px rgba(99,102,241,0.25),
+        inset 0 0 0 1px rgba(255,255,255,0.5);
+    transform-style: preserve-3d;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: fadeUp 0.9s ease;
+}
+
+.auth-card:hover {
+    box-shadow: 0 40px 80px rgba(99,102,241,0.35);
+}
+
+/* ===============================
+   HEADER
+================================ */
+.auth-card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #4f8ef7, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-subtitle {
+    font-size: 0.95rem;
+    color: #f0f4fb;
+    margin-top: 0.4rem;
+}
+
+/* ===============================
+   FORM
+================================ */
+.form-label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-control-custom {
+    border-radius: 14px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    transition: all 0.3s ease;
+}
+
+.form-control-custom:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.18);
+    outline: none;
+}
+
+/* ===============================
+   BUTTON
+================================ */
+.btn-primary-custom {
+    background: linear-gradient(135deg, #4f8ef7, #6366f1);
+    border: none;
+    border-radius: 16px;
+    padding: 0.8rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 12px 28px rgba(99,102,241,0.35);
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 22px 45px rgba(99,102,241,0.5);
+}
+
+/* ===============================
+   LINKS
+================================ */
+.auth-link-text {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.auth-link {
+    color: #6366f1;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   ANIMATION
+================================ */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+
+<!-- Background Orbs -->
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+
 <div class="auth-container">
-    <div class="auth-card">
+    <div class="auth-card" id="auth-card">
         <div class="auth-card-header">
             <h2 class="auth-title">Create Account</h2>
-            <p class="auth-subtitle">Join the conversation</p>
+            <p class="auth-subtitle">Join PV-Chat & start conversations</p>
         </div>
-        <div class="auth-card-body">
-            <form method="POST" action="{{ url_for('register') }}">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control form-control-custom" id="username" name="username" required autofocus minlength="3">
-                    <small class="form-text text-muted">3+ characters, letters, numbers, and underscores only</small>
-                </div>
-                <div class="mb-4">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control form-control-custom" id="password" name="password" required minlength="6">
-                    <small class="form-text text-muted">Minimum 6 characters</small>
-                </div>
-                <button type="submit" class="btn btn-primary-custom w-100 mb-3">Register</button>
-                <div class="text-center">
-                    <p class="auth-link-text">Already have an account? <a href="{{ url_for('login') }}" class="auth-link">Login</a></p>
-                </div>
-            </form>
-        </div>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text"
+                       class="form-control form-control-custom"
+                       name="username"
+                       required minlength="3"
+                       placeholder="Choose a username">
+                <small class="text-muted">3+ characters · letters & numbers</small>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <input type="password"
+                       class="form-control form-control-custom"
+                       name="password"
+                       required minlength="6"
+                       placeholder="Create a password">
+                <small class="text-muted">Minimum 6 characters</small>
+            </div>
+
+            <button class="btn btn-primary-custom w-100 mb-3">
+                Create Account
+            </button>
+
+            <div class="text-center">
+                <p class="auth-link-text">
+                    Already registered?
+                    <a href="{{ url_for('login') }}" class="auth-link">Login</a>
+                </p>
+            </div>
+        </form>
     </div>
 </div>
-{% endblock %}
 
+<script>
+/* ===============================
+   CUSTOM CURSOR
+================================ */
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+});
+
+/* ===============================
+   3D CARD TILT
+================================ */
+const card = document.getElementById('auth-card');
+card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+
+    const dx = (x - cx) / cx;
+    const dy = (y - cy) / cy;
+
+    card.style.transform = `
+        rotateY(${dx * 10}deg)
+        rotateX(${-dy * 10}deg)
+        scale(1.02)
+    `;
+});
+
+card.addEventListener('mouseleave', () => {
+    card.style.transform = 'rotateY(0) rotateX(0) scale(1)';
+});
+</script>
+{% endblock %}
