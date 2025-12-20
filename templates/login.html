@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Chat App{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <h2 class="auth-title">Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to start chatting</p>
+        </div>
+        <div class="auth-card-body">
+            <form method="POST" action="{{ url_for('login') }}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control form-control-custom" id="username" name="username" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control form-control-custom" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100 mb-3">Login</button>
+                <div class="text-center">
+                    <p class="auth-link-text">Don't have an account? <a href="{{ url_for('register') }}" class="auth-link">Register</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

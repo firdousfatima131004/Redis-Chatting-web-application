@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ user.username }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .profile-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .profile-card {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+        color: #FFFFFF;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin: 0 auto 1rem;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-username {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-body {
+        padding: 2rem;
+    }
+
+    .profile-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .profile-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .profile-info-label {
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .profile-info-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .status-badge-profile {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .status-badge-profile.online {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--online-green);
+    }
+
+    .status-badge-profile.offline {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: var(--offline-gray);
+    }
+
+    .profile-actions {
+        padding: 1.5rem 2rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="profile-username">{{ user.username }}</div>
+            <div class="status-badge-profile {{ 'online' if stats.is_online else 'offline' }}">
+                {{ 'Online' if stats.is_online else 'Offline' }}
+            </div>
+        </div>
+
+        <div class="profile-body">
+            <div class="profile-info-item">
+                <span class="profile-info-label">
+                    <i class="bi bi-person"></i> Username
+                </span>
+                <span class="profile-info-value">{{ user.username }}</span>
+            </div>
+
+            <div class="profile-info-item">
+                <span class="profile-info-label">
+                    <i class="bi bi-calendar"></i> Member Since
+                </span>
+                <span class="profile-info-value">
+                    {{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}
+                </span>
+            </div>
+
+            <div class="profile-info-item">
+                <span class="profile-info-label">
+                    <i class="bi bi-clock"></i> Account Age
+                </span>
+                <span class="profile-info-value">
+                    {% if stats.account_age_days is not none %}
+                        {% if stats.account_age_days == 0 %}
+                            Today
+                        {% elif stats.account_age_days == 1 %}
+                            1 day
+                        {% else %}
+                            {{ stats.account_age_days }} days
+                        {% endif %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="profile-info-item">
+                <span class="profile-info-label">
+                    <i class="bi bi-circle-fill"></i> Status
+                </span>
+                <span class="status-badge-profile {{ 'online' if stats.is_online else 'offline' }}">
+                    {{ 'Online' if stats.is_online else 'Offline' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{{ url_for('chat') }}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to Chat
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
