@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}Anonymous - Fade{% endblock %}
+
+{% block content %}
+<div class="container"
+    style="padding-top: var(--spacing-xl); height: calc(100vh - 80px); display: flex; flex-direction: column;">
+    <!-- Public Feed Section (Takes available space) -->
+    <div class="card"
+        style="flex: 1; overflow-y: auto; margin-bottom: var(--spacing-lg); display: flex; flex-direction: column;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; position: sticky; top: 0; background: var(--surface); z-index: 10;">
+            <h3>Public Opinion Wall</h3>
+            <h3>Write messages without reveling your privacy </h3>
+            <button class="btn btn-primary" onclick="loadFeed()"
+                style="padding: 4px 12px; font-size: 0.8rem;">Refresh</button>
+        </div>
+
+        <div id="anon-feed" style="flex: 1; display: flex; flex-direction: column; gap: var(--spacing-md);">
+            <!-- Messages go here -->
+            <p style="color: var(--text-muted); text-align: center; margin-top: 20px;">Loading messages...</p>
+        </div>
+    </div>
+
+    <!-- Input Section (Fixed at bottom of container) -->
+    <div class="card" style="flex-shrink: 0; padding: var(--spacing-md);">
+        <form id="send-anon-form" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+            <!-- Duration & File Preview -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex:1;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="color: var(--text-secondary); font-size: 0.9rem;">Duration:</label>
+                        <select id="anon-duration" class="form-control"
+                            style="width: auto; padding: 4px 12px; font-size: 0.9rem;">
+                            <option value="5m">5 Minutes</option>
+                            <option value="10m">10 Minutes</option>
+                            <option value="30m">30 Minutes</option>
+                            <option value="1h" selected>1 Hour</option>
+                            <option value="5h">5 Hours</option>
+                            <option value="24h">24 Hours</option>
+                            <option value="Permanent">Permanent</option>
+                        </select>
+                    </div>
+                    <!-- File Preview -->
+                    <div id="file-preview-container" style="display: none; margin-top: 8px;">
+                        <div style="position: relative; display: inline-block;">
+                            <img id="file-preview-img" src=""
+                                style="max-height: 60px; border-radius: 4px; border: 1px solid var(--accent);">
+                            <button type="button" onclick="clearFile()"
+                                style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; cursor: pointer;">&times;</button>
+                        </div>
+                        <div id="file-name-preview" style="font-size: 0.8rem; color: var(--text-muted);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: var(--spacing-md); align-items: flex-end;">
+                <!-- Attach Button -->
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('anon-file').click()"
+                    style="height: 50px; width: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; padding:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                        </path>
+                    </svg>
+                </button>
+                <input type="file" id="anon-file" accept="image/*" style="display: none;"
+                    onchange="handleFileSelect(this)">
+
+                <div style="flex: 1;">
+                    <textarea class="form-control" id="anon-message" rows="2"
+                        placeholder="Share your opinion anonymously..." style="resize: none;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary"
+                    style="height: 50px; width: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <!-- Arrow Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    let currentFile = null;
+
+    function handleFileSelect(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Limit size (e.g. 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast("File too large (Max 2MB)");
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                currentFile = {
+                    data: e.target.result, // Base64
+                    type: file.type,
+                    name: file.name
+                };
+
+                // Show preview
+                document.getElementById('file-preview-container').style.display = 'block';
+                if (file.type.startsWith('image/')) {
+                    document.getElementById('file-preview-img').src = e.target.result;
+                    document.getElementById('file-preview-img').style.display = 'block';
+                    document.getElementById('file-name-preview').style.display = 'none';
+                } else {
+                    document.getElementById('file-preview-img').style.display = 'none';
+                    document.getElementById('file-name-preview').style.display = 'block';
+                    document.getElementById('file-name-preview').innerText = file.name;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearFile() {
+        currentFile = null;
+        document.getElementById('anon-file').value = '';
+        document.getElementById('file-preview-container').style.display = 'none';
+        document.getElementById('file-preview-img').src = '';
+    }
+
+    document.getElementById('send-anon-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const messageInput = document.getElementById('anon-message');
+        const durationInput = document.getElementById('anon-duration');
+        const message = messageInput.value.trim();
+        const duration = durationInput.value;
+
+        if (!message && !currentFile) return;
+
+        try {
+            const payload = {
+                message,
+                duration,
+                file_data: currentFile ? currentFile.data : null,
+                file_type: currentFile ? currentFile.type : null
+            };
+
+            const res = await fetch('/api/anonymous/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                messageInput.value = '';
+                clearFile(); // Clear file
+                await loadFeed();
+            } else {
+                showToast('Error: ' + data.error);
+            }
+        } catch (err) {
+            showToast('Failed to post message');
+        }
+    });
+
+    let feedInterval;
+
+    async function loadFeed() {
+        const container = document.getElementById('anon-feed');
+
+        try {
+            const res = await fetch('/api/anonymous/feed');
+            const data = await res.json();
+
+            container.innerHTML = '';
+            // Clear existing interval
+            if (feedInterval) clearInterval(feedInterval);
+
+            if (data.messages && data.messages.length > 0) {
+                const now = new Date();
+
+                data.messages.forEach(msg => {
+                    // Create element
+                    const div = document.createElement('div');
+                    div.style.background = 'rgba(255,255,255,0.03)';
+                    div.style.padding = 'var(--spacing-md)';
+                    div.style.borderRadius = 'var(--radius-sm)';
+                    div.style.borderLeft = '3px solid var(--accent)';
+                    div.style.transition = 'all 0.5s ease-out';
+                    div.dataset.id = msg.id; // Store ID for reference
+
+                    // Parse Timestamp (UTC)
+                    const msgTime = new Date(msg.timestamp); // This is UTC as ISO string
+                    // Convert to IST for display
+                    const timeString = msgTime.toLocaleString('en-IN', {
+                        timeZone: 'Asia/Kolkata',
+                        hour12: true,
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    // Prepare Expiry Logic
+                    let expiryHtml = '';
+                    let expiryTimestamp = null;
+
+                    if (msg.type === 'permanent') {
+                        expiryHtml = '🔒 Permanent';
+                    } else if (msg.expires_in) {
+                        // Calculate absolute expiry time: msgTime + seconds
+                        expiryTimestamp = new Date(msgTime.getTime() + msg.expires_in * 1000);
+                        expiryHtml = `<span class="countdown">Calculating...</span>`;
+                        div.dataset.expiry = expiryTimestamp.getTime(); // Store expiry timestamp
+                    } else {
+                        expiryHtml = 'Temporary';
+                    }
+
+                    // Avatar
+                    const initial = msg.sender.charAt(0).toUpperCase();
+
+                    // Render Content (Message + File)
+                    let contentHtml = `<div
+    style="color: var(--text-primary); font-size: 1.1rem; line-height: 1.5; white-space: pre-wrap; margin-bottom: 8px;">
+    ${msg.message ? msg.message.replace(/</g, "&lt;").replace(/>/g, "&gt;") : ''}</div>`;
+
+                    if (msg.file_data) {
+                        if (msg.file_type && msg.file_type.startsWith('image/')) {
+                            contentHtml += `<div style="margin-top: 8px;"><img src="${msg.file_data}"
+        style="max-width: 100%; border-radius: var(--radius-sm); max-height: 400px; display: block;" loading="lazy">
+</div>`;
+                        } else {
+                            contentHtml += `<div style="margin-top: 8px;"><a href="${msg.file_data}" download="file" class="btn btn-secondary"
+        style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem;">📄 Download Attachment</a></div>
+`;
+                        }
+                    }
+
+                    div.innerHTML = `
+<div style="display: flex; gap: 12px; margin-bottom: 8px;">
+    <div
+        style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">
+        ${initial}
+    </div>
+
+    <div style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span class="username-link" style="color: var(--accent); font-weight: bold; cursor: pointer;"
+                onclick="showPrivacyAlert()">
+                @${msg.sender}
+            </span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">
+                ${timeString}
+            </span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px;">
+            ${expiryHtml}
+        </div>
+    </div>
+</div>
+<div style="padding-left: 52px;">
+    ${contentHtml}
+</div>
+`;
+                    container.appendChild(div);
+                });
+
+                // Start Countdown Loop
+                startCountdownLoop();
+
+            } else {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 20px;">No opinions shared yet. Be the first!</p>';
+            }
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = '<p style="color:var(--danger); text-align:center;">Failed to load feed.</p>';
+        }
+    }
+
+    function startCountdownLoop() {
+        feedInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const cards = document.querySelectorAll('#anon-feed > div');
+
+            cards.forEach(card => {
+                const expiryAttr = card.dataset.expiry;
+                if (!expiryAttr) return; // Permanent or undefined
+
+                const expiryTime = parseInt(expiryAttr);
+                const diff = expiryTime - now;
+
+                const countdownSpan = card.querySelector('.countdown');
+                if (!countdownSpan) return;
+
+                if (diff <= 0) {
+                    // Expired!
+                    countdownSpan.innerText = "Expired";
+                    countdownSpan.style.color = "var(--danger)";
+
+                    // Animate removal
+                    if (!card.classList.contains('expiring')) {
+                        card.classList.add('expiring');
+                        card.style.transition = 'opacity 1s ease, transform 1s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            card.remove();
+                            if (document.getElementById('anon-feed').children.length === 0) {
+                                document.getElementById('anon-feed').innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 20px;">No opinions shared yet. Be the first!</p>';
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    // Show remaining
+                    const minutes = Math.floor(diff / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+
+                    if (minutes > 60) {
+                        const hours = Math.floor(minutes / 60);
+                        countdownSpan.innerText = `⏳ ${hours}h ${minutes % 60}m left`;
+                    } else if (minutes > 0) {
+                        countdownSpan.innerText = `⏳ ${minutes}m ${seconds}s left`;
+                    } else {
+                        countdownSpan.innerText = `⏳ ${seconds}s left`;
+                        countdownSpan.style.color = "var(--warning)";
+                    }
+                }
+            });
+        }, 1000);
+    }
+
+    function showPrivacyAlert() {
+        showToast("For privacy reasons, we cannot show this user's profile.");
+    }
+
+    // Load on start
+    loadFeed();
+</script>
+{% endblock %}
