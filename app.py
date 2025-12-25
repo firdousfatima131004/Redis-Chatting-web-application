@@ -530,8 +530,8 @@ def public_feed():
     finally:
         db.close()
         
-    # Sort combined list by timestamp descending (newest first)
-    messages.sort(key=lambda x: x["timestamp"], reverse=True)
+    # Sort combined list by timestamp ascending (oldest first, like a chat log)
+    messages.sort(key=lambda x: x["timestamp"], reverse=False)
             
     return jsonify({"messages": messages})
 
