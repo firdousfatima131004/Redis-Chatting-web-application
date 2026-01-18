@@ -17,12 +17,26 @@
     {% if session.get('username') %}
     <nav class="navbar">
         <div class="container nav-container">
+            <!-- Brand -->
             <a href="{{ url_for('chat') }}" class="nav-brand">Fade</a>
-            <div class="nav-links">
-                <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
-                <a href="{{ url_for('chat') }}" class="nav-link">Chats</a>
-                <a href="{{ url_for('anonymous') }}" class="nav-link" id="nav-anon">Anonymous</a>
-                <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--danger)">Logout</a>
+
+            <!-- Navigation items wrapper -->
+            <div class="nav-content">
+                <!-- Main Links -->
+                <div class="nav-links">
+                    <a href="{{ url_for('chat') }}"
+                        class="nav-link {% if request.endpoint == 'chat' %}active{% endif %}">Chats</a>
+                    <a href="{{ url_for('anonymous') }}"
+                        class="nav-link {% if request.endpoint == 'anonymous' %}active{% endif %}"
+                        id="nav-anon">Anonymous</a>
+                    <a href="{{ url_for('profile') }}"
+                        class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}">Profile</a>
+                </div>
+
+                <!-- Separator / Actions -->
+                <div class="nav-actions">
+                    <a href="{{ url_for('logout') }}" class="nav-item-logout">Logout</a>
+                </div>
             </div>
         </div>
     </nav>

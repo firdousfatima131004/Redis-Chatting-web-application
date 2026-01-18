@@ -3,131 +3,201 @@
 {% block title %}Chat - Fade{% endblock %}
 
 {% block content %}
-<div class="container" style="display: flex; gap: var(--spacing-lg); height: calc(100vh - 80px);">
+<div class="container">
+    <div class="chat-container">
 
-    <!-- Sidebar -->
-    <div class="card"
-        style="width: 320px; display: flex; flex-direction: column; padding: var(--spacing-md); gap: var(--spacing-md);">
+        <!-- Sidebar Panel -->
+        <div class="panel" style="width: 320px; padding: var(--spacing-md); flex-shrink: 0;">
 
-        <!-- Section: Friend Requests -->
-        <div id="requests-section" style="display: none;">
-            <h5 style="font-size: 0.9rem; color: var(--accent);">Friend Requests</h5>
-            <div id="friend-requests-list" style="max-height: 150px; overflow-y: auto;"></div>
-        </div>
-
-        <!-- Section: Friends -->
-        <!-- Sidebar -->
-        <div class="chat-sidebar">
-            <div class="sidebar-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <h5 style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Friends</h5>
-                <!-- Search Icon / Toggle -->
-                <button class="btn-icon" onclick="toggleFriendSearch()"
-                    style="background:none; border:none; color:var(--text-secondary); cursor:pointer;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
+            <!-- Friend Requests Section (Hidden by default) -->
+            <div id="requests-section" class="sidebar-section" style="display: none;">
+                <div class="sidebar-header">
+                    <span class="sidebar-title" style="color: var(--accent);">Friend Requests</span>
+                </div>
+                <div id="friend-requests-list" style="max-height: 150px; overflow-y: auto;"></div>
             </div>
 
-            <!-- Hidden Search Input -->
-            <div id="friend-search-container" style="display:none; margin-bottom: 10px;">
-                <input type="text" id="friend-search-input" class="form-control" placeholder="Search friends..."
-                    onkeyup="filterFriends()" style="padding: 6px 12px; font-size: 0.9rem;">
-            </div>
-
-            <div class="friends-list" id="friends-list" style="flex: 1; overflow-y: auto;">
-                <p style="color: var(--text-muted); font-size: 0.8rem; text-align: center;">Loading friends...</p>
-            </div>
-        </div>
-
-        <!-- Section: Suggestions -->
-        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--spacing-sm);">
-
-            <!-- Global Search -->
-            <h5 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">Find People</h5>
-            <div style="display:flex; gap:5px; margin-bottom:12px;">
-                <input type="text" id="global-search-input" class="form-control" placeholder="Username..."
-                    style="padding: 6px 12px; font-size: 0.9rem;">
-                <button class="btn btn-primary" onclick="searchGlobalUsers()" style="padding: 0 10px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
-            </div>
-            <div id="global-search-results" style="max-height: 100px; overflow-y: auto; margin-bottom: 10px;"></div>
-
-            <h5 style="font-size: 0.9rem; color: var(--text-secondary); margin-top: var(--spacing-sm);">You May Like
-            </h5>
-            <div id="recommendations-list" style="max-height: 150px; overflow-y: auto;"></div>
-        </div>
-    </div>
-
-    <!-- Chat Area -->
-    <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 0;">
-
-        <!-- Header -->
-        <div
-            style="padding: var(--spacing-md); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between;">
-            <div id="chat-header-info" style="display: none; align-items: center;">
-                <span id="chat-status-dot" class="status-indicator"></span>
-                <h4 style="margin: 0;" id="chat-username">Username</h4>
-            </div>
-            <div id="no-chat-header" style="color: var(--text-muted);">Select a friend to fade with</div>
-        </div>
-
-        <!-- Messages -->
-        <div id="messages-container"
-            style="flex: 1; overflow-y: auto; padding: var(--spacing-md); display: flex; flex-direction: column; gap: 8px;">
-            <div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">
-                <i class="bi bi-chat-square-text" style="font-size: 2rem; opacity: 0.5;"></i>
-                <p>Select a friend to start chatting</p>
-            </div>
-        </div>
-
-        <!-- Input -->
-        <div id="input-area"
-            style="padding: var(--spacing-md); border-top: 1px solid rgba(255,255,255,0.05); display: none;">
-
-            <!-- File Preview Area -->
-            <div id="chat-file-preview"
-                style="display: none; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;">
-                <div style="position: relative; display: inline-block;">
-                    <img id="chat-preview-img" src=""
-                        style="max-height: 80px; border-radius: var(--radius-sm); border: 1px solid var(--accent);">
-                    <button onclick="clearChatFile()"
-                        style="position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">&times;</button>
+            <!-- Groups Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Groups</span>
+                    <button class="btn-icon" onclick="openCreateGroupModal()" style="width: 24px; height: 24px;"
+                        title="Create Group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="groups-list" style="max-height: 200px; overflow-y: auto;">
+                    <p style="color: var(--text-muted); font-size: 0.8rem; padding: 0 12px;">Loading...</p>
                 </div>
             </div>
 
-            <div style="display: flex; gap: var(--spacing-sm); align-items: flex-end;">
-                <!-- Attach Button -->
-                <button class="btn btn-secondary" onclick="document.getElementById('chat-file-input').click()"
-                    style="height: 40px; width: 40px; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path
-                            d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
-                        </path>
-                    </svg>
-                </button>
-                <input type="file" id="chat-file-input" accept="image/*" style="display: none;"
-                    onchange="handleChatFileSelect(this)">
+            <!-- Friends Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Direct Messages</span>
+                    <button class="btn-icon" onclick="toggleFriendSearch()" style="width: 24px; height: 24px;"
+                        title="Search Friends">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
 
-                <select id="expiration-select" class="form-control" style="width: auto; height: 40px;">
-                    <option value="10s">10s</option>
-                    <option value="1m">1m</option>
-                    <option value="1h" selected>1h</option>
-                </select>
-                <input type="text" id="message-input" class="form-control" placeholder="Type a fading message..."
-                    style="height: 40px;">
-                <button class="btn btn-primary" id="send-button" style="height: 40px;">Send</button>
+                <div id="friend-search-container" style="display:none; margin-bottom: 10px; padding: 0 4px;">
+                    <input type="text" id="friend-search-input" class="form-control" placeholder="Filter friends..."
+                        onkeyup="filterFriends()" style="font-size: 0.85rem; padding: 6px 10px;">
+                </div>
+
+                <div id="friends-list" style="flex: 1; overflow-y: auto;">
+                    <p style="color: var(--text-muted); font-size: 0.8rem; padding: 0 12px;">Loading friends...</p>
+                </div>
+            </div>
+
+            <!-- Discovery Section -->
+            <div class="sidebar-section" style="border-bottom: none; flex: 1; display: flex; flex-direction: column;">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Discovery</span>
+                </div>
+
+                <div class="input-container" style="margin-bottom: 12px; padding: 4px 8px;">
+                    <select id="search-type" class="select-minimal">
+                        <option value="user">User</option>
+                        <option value="group">Group</option>
+                    </select>
+                    <input type="text" id="global-search-input" class="chat-input" placeholder="Search..."
+                        style="font-size: 0.85rem;">
+                    <button onclick="handleGlobalSearch()" class="btn-icon" style="width: 28px; height: 28px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="global-search-results" style="max-height: 120px; overflow-y: auto; margin-bottom: 10px;"></div>
+
+                <div style="flex: 1; overflow-y: auto;">
+                    <div style="margin-bottom: 8px;">
+                        <span class="sidebar-title" style="margin-bottom: 6px; display: block;">Suggested</span>
+                        <div id="recommendations-list"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Chat Area -->
+        <div class="panel" style="flex: 1; position: relative;">
+
+            <!-- Header -->
+            <div class="chat-header">
+                <div id="chat-header-info" style="display: none; align-items: center; gap: 12px;">
+                    <div id="chat-status-dot" class="status-dot"></div>
+                    <div>
+                        <h4 id="chat-username" style="margin: 0; font-size: 1rem; line-height: 1.2;">Select Chat</h4>
+                        <span id="chat-subtitle"
+                            style="font-size: 0.75rem; color: var(--text-muted); display: block;">Active now</span>
+                    </div>
+                </div>
+                <div id="no-chat-header" style="color: var(--text-muted); font-size: 0.9rem;">Start a conversation</div>
+            </div>
+
+            <!-- Messages -->
+            <div id="messages-container"
+                style="flex: 1; overflow-y: auto; padding: var(--spacing-lg); display: flex; flex-direction: column;">
+                <div style="margin: auto; text-align: center; color: var(--text-muted); opacity: 0.5;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                        </path>
+                    </svg>
+                    <p style="margin-top: 10px;">Select a chat to begin</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div id="input-area" class="input-area-wrapper" style="display: none;">
+
+                <!-- File Preview -->
+                <div id="chat-file-preview"
+                    style="display: none; margin-bottom: 10px; position: absolute; bottom: 80px; left: 20px; background: var(--bg-card); padding: 8px; border-radius: var(--radius-md); box-shadow: var(--shadow-md); border: 1px solid var(--border-subtle);">
+                    <img id="chat-preview-img" src="" style="max-height: 100px; border-radius: var(--radius-sm);">
+                    <button onclick="clearChatFile()"
+                        style="position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+                </div>
+
+                <div class="input-container">
+                    <button class="btn-icon" onclick="document.getElementById('chat-file-input').click()"
+                        title="Attach File">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                            </path>
+                        </svg>
+                    </button>
+                    <input type="file" id="chat-file-input" accept="image/*" style="display: none;"
+                        onchange="handleChatFileSelect(this)">
+
+                    <select id="expiration-select" class="select-minimal" title="Message Duration">
+                        <option value="10s">10s</option>
+                        <option value="1m">1m</option>
+                        <option value="1h" selected>1h</option>
+                        <option value="1d">24h</option>
+                    </select>
+
+                    <div style="width: 1px; height: 20px; background: var(--border-subtle); margin: 0 4px;"></div>
+
+                    <input type="text" id="message-input" class="chat-input" placeholder="Type a message..."
+                        autocomplete="off">
+
+                    <button id="send-button" class="btn-send">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Create Group Modal -->
+<div id="create-group-modal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index:2000; align-items:center; justify-content:center;">
+    <div class="card" style="width: 400px; max-width:90%; border: 1px solid var(--border-subtle);">
+        <h4 style="margin-bottom: 20px;">Create Group</h4>
+        <div class="form-group">
+            <label class="form-label">Group Name</label>
+            <input type="text" id="new-group-name" class="form-control" placeholder="e.g. Study Buddies">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Description (Optional)</label>
+            <input type="text" id="new-group-desc" class="form-control" placeholder="Short topic...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Type</label>
+            <select id="new-group-type" class="form-control" style="background-color: rgba(255,255,255,0.05);">
+                <option value="public" style="color:black;">Public (Searchable)</option>
+                <option value="private" style="color:black;">Private (Invite Only)</option>
+            </select>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px;">
+            <button class="btn" style="background:transparent; color: var(--text-secondary);"
+                onclick="closeCreateGroupModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="createGroup()">Create Group</button>
+        </div>
     </div>
 </div>
 
@@ -147,8 +217,12 @@
     async function loadSidebar() {
         // Friends
         fetch('/api/friends/list')
-            .then(r => r.json())
-            .then(data => renderFriends(data.friends));
+            .then(r => {
+                if (r.status === 401) window.location.href = '/login';
+                return r.json();
+            })
+            .then(data => renderFriends(data.friends))
+            .catch(e => console.log("Sidebar error", e));
 
         // Requests
         fetch('/api/friends/requests')
@@ -159,13 +233,15 @@
         fetch('/api/recommendations')
             .then(r => r.json())
             .then(data => renderRecommendations(data.users));
+
+        loadGroups();
     }
 
     function renderFriends(friends) {
         const container = document.getElementById('friends-list');
         container.innerHTML = '';
         if (!friends || friends.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-muted);font-size:0.8rem;">No friends added.</p>';
+            container.innerHTML = '<p style="color:var(--text-muted);font-size:0.8rem; padding: 0 12px;">No friends added.</p>';
             return;
         }
 
@@ -174,19 +250,16 @@
 
         friends.forEach(f => {
             const div = document.createElement('div');
-            div.style.padding = '8px';
-            div.style.cursor = 'pointer';
-            div.style.borderRadius = 'var(--radius-sm)';
-            div.style.display = 'flex';
-            div.style.alignItems = 'center';
-            div.style.justifyContent = 'space-between';
-            div.className = 'nav-link';
+            div.className = 'sidebar-item';
 
             let displayName = f.username;
             let statusClass = f.online ? 'status-online' : 'status-offline';
             let extraStyle = '';
 
-            if (f.expired) {
+            if (f.is_ai) {
+                statusClass = 'ai';
+                displayName = `${f.username} <span class="badge-ai">AI</span>`;
+            } else if (f.expired) {
                 // Apply User's Requested "Combining Character" Strikethrough
                 displayName = toStrikethrough(displayName);
                 statusClass = 'status-offline'; // Expired is offline
@@ -197,17 +270,11 @@
             const hoverTitle = f.expired ? "This account is expired" : "";
 
             div.innerHTML = `
-                <div style="display:flex; align-items:center; ${extraStyle}" title="${hoverTitle}">
-                    <span class="status-indicator ${statusClass}"></span>
+                <div class="sidebar-item-content" style="${extraStyle}" title="${hoverTitle}">
+                    <span class="status-dot ${statusClass}"></span>
                     <span>${displayName}</span>
                 </div>
             `;
-
-            // Only allow chat if not expired? Or allow view?
-            // User just said "expired for some time", implying maybe they come back?
-            // "means this accound is justbexpired for some time"
-            // For now, let's keep click active or maybe alert?
-            // User request usually implies visual indication. Strikethrough often means "inactive".
 
             if (!f.expired) {
                 div.onclick = () => startChat(f.username);
@@ -232,14 +299,14 @@
 
         requests.forEach(req => {
             const div = document.createElement('div');
-            div.style.padding = '6px';
+            div.style.padding = '8px 12px';
             div.style.background = 'rgba(255,255,255,0.05)';
             div.style.marginBottom = '4px';
             div.style.borderRadius = 'var(--radius-sm)';
             div.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:0.9rem;">${req}</span>
-                    <button class="btn btn-primary" onclick="acceptRequest('${req}')" style="padding:2px 8px; font-size:0.7rem;">Accept</button>
+                    <button class="btn btn-primary" onclick="acceptRequest('${req}')" style="padding:2px 8px; font-size:0.75rem; height: auto;">Accept</button>
                 </div>
             `;
             container.appendChild(div);
@@ -264,12 +331,11 @@
         }
         users.forEach(u => {
             const div = document.createElement('div');
-            div.style.padding = '6px';
-            div.style.display = 'flex';
-            div.style.justifyContent = 'space-between';
-            div.style.alignItems = 'center';
+            div.className = 'sidebar-item';
             div.innerHTML = `
-                <span style="font-size:0.9rem; color:var(--text-secondary);">${u.username}</span>
+                <div class="sidebar-item-content">
+                    <span style="font-size:0.9rem;">${u.username}</span>
+                </div>
                 <button onclick="sendRequest('${u.username}')" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:1.2rem;">+</button>
             `;
             container.appendChild(div);
@@ -296,7 +362,17 @@
         // Update Header
         document.getElementById('no-chat-header').style.display = 'none';
         document.getElementById('chat-header-info').style.display = 'flex';
-        document.getElementById('chat-username').innerText = data.other_user;
+
+        if (data.type === 'group') {
+            document.getElementById('chat-username').innerText = `# ${data.name}`;
+            document.getElementById('chat-status-dot').className = 'status-dot online';
+            document.getElementById('chat-subtitle').innerText = 'Group Chat';
+        } else {
+            document.getElementById('chat-username').innerText = data.other_user;
+            document.getElementById('chat-status-dot').className = 'status-dot online';
+            document.getElementById('chat-subtitle').innerText = 'Active now';
+        }
+
         document.getElementById('input-area').style.display = 'block';
 
         // Clear & Load Messages
@@ -315,29 +391,39 @@
     });
 
     function addMessage(msg) {
+        console.log("Add msg", msg);
         const container = document.getElementById('messages-container');
         const isMe = msg.from === username;
 
         const div = document.createElement('div');
-        div.className = 'message-bubble'; // We'll style inline for now but class implies styling
+        div.className = isMe ? 'message-bubble sent' : 'message-bubble received';
         div.id = `msg-${msg.id}`;
 
-        // Inline styles for message bubbles
-        div.style.maxWidth = '70%';
-        div.style.padding = '10px 14px';
-        div.style.borderRadius = 'var(--radius-md)';
-        div.style.marginBottom = '8px';
-        div.style.position = 'relative';
-        div.style.alignSelf = isMe ? 'flex-end' : 'flex-start';
-        div.style.background = isMe ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
-        div.style.color = 'white';
-        div.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        // Prepare Content
+        let contentHtml = '';
+
+        // Show sender name in groups if not me
+        if (!isMe && currentRoom.startsWith('group_')) {
+            contentHtml += `<div style="font-size:0.7rem; color:var(--accent); margin-bottom:2px; font-weight:600;">${msg.from}</div>`;
+        }
+
+        if (msg.message) {
+            contentHtml += `<div>${msg.message}</div>`;
+        }
+
+        if (msg.file_data) {
+            if (msg.file_type && msg.file_type.startsWith('image/')) {
+                contentHtml += `<div style="margin-top:5px;"><img src="${msg.file_data}" style="max-width:100%; border-radius:4px; display:block;"></div>`;
+            } else {
+                contentHtml += `<div style="margin-top:5px;"><a href="${msg.file_data}" download class="btn" style="background:rgba(0,0,0,0.2); padding:4px 8px; font-size:0.8rem;">📎 Attachment</a></div>`;
+            }
+        }
 
         div.innerHTML = `
-            <div style="font-size:0.95rem;">${msg.message}</div>
-            <div style="font-size:0.7rem; opacity:0.7; margin-top:4px; display:flex; justify-content:space-between; gap:8px;">
+            ${contentHtml}
+            <div class="message-meta">
                 <span>${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                <span id="timer-${msg.id}" style="font-weight:bold;">${formatTime(msg.time_remaining)}</span>
+                <span id="timer-${msg.id}" style="font-weight:600;">${formatTime(msg.time_remaining)}</span>
             </div>
         `;
 
@@ -366,7 +452,7 @@
                     msgEl.style.animation = 'flyAway 1s forwards ease-in';
                     // After animation, hide or remove content
                     setTimeout(() => {
-                        msgEl.innerHTML = '<span style="font-style:italic; opacity:0.5;">Message Expired</span>';
+                        msgEl.innerHTML = '<span style="font-style:italic; opacity:0.5; font-size:0.8rem;">Expired</span>';
                         msgEl.style.animation = 'none'; // reset
                         msgEl.style.background = 'transparent';
                         msgEl.style.boxShadow = 'none';
@@ -374,6 +460,7 @@
                         msgEl.style.padding = '0';
                         msgEl.style.textAlign = 'center';
                         msgEl.style.alignSelf = 'center';
+                        msgEl.className = 'message-bubble'; // remove sent/received
                     }, 900);
                 }
             } else {
@@ -445,55 +532,6 @@
         clearChatFile();
     }
 
-    // --- Render Update ---
-    function addMessage(msg) {
-        const container = document.getElementById('messages-container');
-        const isMe = msg.from === username;
-
-        const div = document.createElement('div');
-        div.className = 'message-bubble';
-        div.id = `msg-${msg.id}`;
-
-        // Inline bubble style
-        div.style.maxWidth = '70%';
-        div.style.padding = '10px 14px';
-        div.style.borderRadius = 'var(--radius-md)';
-        div.style.marginBottom = '8px';
-        div.style.position = 'relative';
-        div.style.alignSelf = isMe ? 'flex-end' : 'flex-start';
-        div.style.background = isMe ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
-        div.style.color = 'white';
-        div.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-
-        // Prepare Content
-        let contentHtml = '';
-        if (msg.message) {
-            contentHtml += `<div style="font-size:0.95rem;">${msg.message}</div>`;
-        }
-
-        if (msg.file_data) {
-            if (msg.file_type && msg.file_type.startsWith('image/')) {
-                contentHtml += `<div style="margin-top:5px;"><img src="${msg.file_data}" style="max-width:100%; border-radius:4px; display:block;"></div>`;
-            } else {
-                contentHtml += `<div style="margin-top:5px;"><a href="${msg.file_data}" download class="btn" style="background:rgba(0,0,0,0.2); padding:4px 8px; font-size:0.8rem;">📎 Attachment</a></div>`;
-            }
-        }
-
-        div.innerHTML = `
-            ${contentHtml}
-            <div style="font-size:0.7rem; opacity:0.7; margin-top:4px; display:flex; justify-content:space-between; gap:8px;">
-                <span>${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                <span id="timer-${msg.id}" style="font-weight:bold;">${formatTime(msg.time_remaining)}</span>
-            </div>
-        `;
-
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
-
-        if (msg.time_remaining > 0) {
-            startTimer(msg.id, msg.time_remaining);
-        }
-    }
     function toggleFriendSearch() {
         const container = document.getElementById('friend-search-container');
         const input = document.getElementById('friend-search-input');
@@ -509,7 +547,8 @@
 
     function filterFriends() {
         const query = document.getElementById('friend-search-input').value.toLowerCase();
-        const listItems = document.querySelectorAll('#friends-list > div.nav-link');
+        // Updated selector to match new sidebar-item
+        const listItems = document.querySelectorAll('#friends-list > .sidebar-item');
 
         listItems.forEach(item => {
             const username = item.innerText.toLowerCase();
@@ -521,13 +560,146 @@
         });
     }
 
+
+    // --- Group Logic ---
+    async function loadGroups() {
+        fetch('/api/groups/list')
+            .then(r => r.json())
+            .then(data => renderGroups(data.groups));
+    }
+
+    function renderGroups(groups) {
+        const container = document.getElementById('groups-list');
+        container.innerHTML = '';
+        if (!groups || groups.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted);font-size:0.8rem; padding: 0 12px;">No groups joined</p>';
+            return;
+        }
+
+        groups.forEach(g => {
+            const div = document.createElement('div');
+            div.className = 'sidebar-item';
+            div.onclick = () => startGroupChat(g.id);
+
+            const adminBadge = g.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : '';
+
+            div.innerHTML = `
+                <div class="sidebar-item-content">
+                    <span style="font-weight:600; font-size:0.9rem;"># ${g.name}</span>
+                </div>
+                ${adminBadge}
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function openCreateGroupModal() {
+        document.getElementById('create-group-modal').style.display = 'flex';
+    }
+
+    function closeCreateGroupModal() {
+        document.getElementById('create-group-modal').style.display = 'none';
+        document.getElementById('new-group-name').value = '';
+    }
+
+    async function createGroup() {
+        const name = document.getElementById('new-group-name').value.trim();
+        const desc = document.getElementById('new-group-desc').value.trim();
+        const type = document.getElementById('new-group-type').value;
+
+        if (!name) return alert('Name required');
+
+        const res = await fetch('/api/groups/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description: desc, type })
+        });
+        const d = await res.json();
+
+        if (d.success) {
+            closeCreateGroupModal();
+            loadGroups();
+            startGroupChat(d.group.id); // Auto-open new group
+        } else {
+            alert(d.error || 'Failed');
+        }
+    }
+
+    function startGroupChat(groupId) {
+        socket.emit('start_chat', { group_id: groupId });
+    }
+
+    async function joinGroup(groupId) {
+        const res = await fetch('/api/groups/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ group_id: groupId })
+        });
+        const d = await res.json();
+        if (d.success) {
+            loadGroups();
+            startGroupChat(groupId);
+            document.getElementById('global-search-results').innerHTML = ''; // Clear search
+        } else {
+            alert(d.error || 'Join failed');
+        }
+    }
+
+
+    // --- Modified Search ---
+    async function handleGlobalSearch() {
+        const type = document.getElementById('search-type').value;
+        if (type === 'user') {
+            searchGlobalUsers();
+        } else {
+            searchGlobalGroups();
+        }
+    }
+
+    async function searchGlobalGroups() {
+        const query = document.getElementById('global-search-input').value.trim();
+        const container = document.getElementById('global-search-results');
+
+        if (!query) return;
+        container.innerHTML = '<small style="color:var(--text-muted); padding:4px;">Finding...</small>';
+
+        const res = await fetch(`/api/groups/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        container.innerHTML = '';
+        if (!data.groups || data.groups.length === 0) {
+            container.innerHTML = '<small style="color:var(--text-muted); padding:4px;">No groups found.</small>';
+            return;
+        }
+
+        data.groups.forEach(g => {
+            const div = document.createElement('div');
+            div.style.padding = '8px';
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
+            div.style.alignItems = 'center';
+            div.style.backgroundColor = 'var(--bg-highlight)';
+            div.style.borderRadius = 'var(--radius-sm)';
+            div.style.marginBottom = '4px';
+
+            div.innerHTML = `
+                <div>
+                    <div style="font-weight:600;font-size:0.9rem;">${g.name}</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);">${g.description || 'No desc'}</div>
+                </div>
+                <button onclick="joinGroup(${g.id})" class="btn btn-primary" style="padding:4px 10px;font-size:0.75rem;">Join</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
     async function searchGlobalUsers() {
         const query = document.getElementById('global-search-input').value.trim();
         const container = document.getElementById('global-search-results');
 
         if (!query) return;
 
-        container.innerHTML = '<small style="color:var(--text-muted)">Searching...</small>';
+        container.innerHTML = '<small style="color:var(--text-muted); padding:4px;">Searching...</small>';
 
         try {
             const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`);
@@ -536,20 +708,25 @@
             container.innerHTML = '';
 
             if (data.users.length === 0) {
-                container.innerHTML = '<small style="color:var(--text-muted)">No users found.</small>';
+                container.innerHTML = '<small style="color:var(--text-muted); padding:4px;">No users found.</small>';
                 return;
             }
 
             data.users.forEach(u => {
                 const div = document.createElement('div');
-                div.style.padding = '4px 0';
+                div.style.padding = '8px';
                 div.style.display = 'flex';
                 div.style.justifyContent = 'space-between';
                 div.style.alignItems = 'center';
+                // Use sidebar-item style for consistency?
+                // Minimal inline style for search results
+                div.style.marginBottom = '4px';
+                div.style.borderRadius = 'var(--radius-sm)';
+                div.style.backgroundColor = 'var(--bg-highlight)';
 
                 const action = u.is_friend
                     ? `<small style="color:var(--success)">Friend</small>`
-                    : `<button onclick="sendRequest('${u.username}')" style="background:none; border:none; color:var(--accent); cursor:pointer;">+</button>`;
+                    : `<button onclick="sendRequest('${u.username}')" class="btn-icon" style="width:24px; height:24px;">+</button>`;
 
                 div.innerHTML = `
                     <span style="font-size:0.9rem;">${u.username}</span>
@@ -563,5 +740,6 @@
             container.innerHTML = '<small style="color:var(--danger)">Error searching.</small>';
         }
     }
+
 </script>
 {% endblock %}

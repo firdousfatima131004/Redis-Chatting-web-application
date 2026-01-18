@@ -51,6 +51,47 @@ class PublicMessage(Base):
         }
 
 
+
+from sqlalchemy import ForeignKey, Table
+from sqlalchemy.orm import relationship
+
+class Group(Base):
+    """Group model for persistent group metadata"""
+    __tablename__ = "groups"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    description = Column(String(200), nullable=True)
+    type = Column(String(20), default="public") # public, private
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    members = relationship("GroupMember", back_populates="group", cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "type": self.type,
+            "created_at": self.created_at.isoformat() + "Z"
+        }
+
+class GroupMember(Base):
+    """Association table for User-Group membership"""
+    __tablename__ = "group_members"
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    group_id = Column(Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False)
+    role = Column(String(20), default="member") # admin, member
+    joined_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    group = relationship("Group", back_populates="members")
+    user = relationship("User")
+
+
 # Database setup
 # ✅ check_same_thread=False helps when app uses threads (Flask-SocketIO threading mode).
 engine = create_engine(
